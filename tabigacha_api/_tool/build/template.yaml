@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  app
+  
+  Sample SAM Template for app
+
+Parameters:
+  Stage:
+    Description: デプロイ環境
+    Type: String
+    AllowedValues:
+      - local
+      - prod
+    Default: local
+  ImageUri:
+    Type: String
+    Description: Docker Image Uri
+  EntryPoint:
+    Type: String
+    Description: API Endpoint
+  
+
+Mappings:
+  DynamodbConfigMap:
+    local:
+      endpoint: http://host.docker.internal:4566
+    prod:
+      endpoint: ""
+
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Stage
+        DYNAMODB_ENDPOINT: !FindInMap [DynamodbConfigMap, !Ref Stage, endpoint]
+
+Resources:
+  PingFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ../../api/entrypoint/ping/internal/
+      Handler: ping
+      Runtime: go1.x
+      MemorySize: 128
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: "/ping"
+            Method: GET
+
+  BestPriceFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ../../api/entrypoint/bestPrice/internal/
+      Handler: bestPrice
+      Runtime: go1.x
+      MemorySize: 128
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: "/bestPrice"
+            Method: GET
+      
+  PriceCalenderFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ../../api/entrypoint/priceCalender/internal/
+      Handler: priceCalender
+      Runtime: go1.x
+      MemorySize: 128
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: "/calender"
+            Method: GET

@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: tabigacha API
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /flight/bestPrice:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/FlightPriceCalenderResponse'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-flight
+      description: 出発地と目的地を指定して最安価格を返却します
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: origin
+          description: 出発地
+        - schema:
+            type: string
+          in: query
+          name: destination
+          description: 目的地
+    parameters: []
+  /flight/calender:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/FlightPriceCalenderResponse'
+      operationId: get-flight-calender
+      description: 直近3ヶ月までの価格を返却します
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: origin
+          description: 出発地
+        - schema:
+            type: string
+          in: query
+          name: destination
+          description: 目的地
+components:
+  schemas: {}
+  responses:
+    FlightBestPriceResponse:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              price:
+                type: integer
+              url:
+                type: string
+          examples:
+            example-1:
+              value:
+                price: 0
+                url: string
+    FlightPriceCalenderResponse:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                date:
+                  type: string
+                price:
+                  type: integer

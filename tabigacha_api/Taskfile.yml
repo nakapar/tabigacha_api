@@ -1,0 +1,41 @@
+version: 3
+
+tasks:
+  default:
+    cmds:
+      - task: help
+  
+  help:
+    silent: true
+    desc: "タスク一覧を表示"
+    cmds:
+      - task -l
+
+  build-bestPrice:
+    desc: "bestprice API のlambda のsam buildを実行します"
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o ./bin/entrypoint/bestPrice ./api/entrypoint/bestPrice/internal
+      - sam build -t _tool/build/template.yaml
+
+  build-priceCalender:
+    desc: "priceCalender API のlambda のsam buildを実行します"
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o ./bin/entrypoint/priceCalender ./api/entrypoint/priceCalender/internal
+      - sam build -t _tool/build/template.yaml
+
+  build-ping:
+    cmds:
+      - GOOS=linux GOARCH=arm64 go build -o ./bin/entrypoint/ping ./api/entrypoint/ping/internal
+      - sam build -t _tool/build/template.yaml
+
+  start-api:
+    desc: "Targetで指定したAPIでsam local start-apiを実行します"
+    cmds:
+      - sam local start-api --port 3333 --parameter-overrides EntryPoint={{.TARGET}}
+
+  start: 
+    desc: "ビルドからAPIの呼び出しを一括実行します"
+    cmds:
+      - task build-{{.TARGET}}
+      - task start-api TARGET=/{{.TARGET}}
+
